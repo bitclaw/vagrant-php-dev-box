@@ -58,9 +58,14 @@ Vagrant::Config.run do |config|
   # # }
   #
   config.vm.provision :puppet do |puppet|
+    # Configure puppet manifests path
     puppet.manifests_path = "puppet/manifests"
-    puppet.module_path = "puppet/modules"
-    puppet.options = ['--verbose']
+    puppet.manifest_file = "default.pp"
+    # allow symlinks in vm
+    config.vm.customize ["setextradata", :id, "VBoxInternal2/SharedFoldersEnableSymlinksCreate/v-root", "1"]
+    config.vm.customize ['modifyvm', :id, '--natdnshostresolver1', 'on']
+    config.vm.customize ['modifyvm', :id, '--memory', 2048] # for quickly importing database.
+    config.vm.customize ['modifyvm', :id, '--cpus', 2] # for quickly importing database.
   end
 
   # Enable provisioning with chef solo, specifying a cookbooks path, roles
@@ -100,7 +105,4 @@ Vagrant::Config.run do |config|
   # chef-validator, unless you changed the configuration.
   #
   #   chef.validation_client_name = "ORGNAME-validator"
-
-  # allow symlinks in vm
-  config.vm.customize ["setextradata", :id, "VBoxInternal2/SharedFoldersEnableSymlinksCreate/v-root", "1"]
 end
